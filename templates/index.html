@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Прогноз отказа станков</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <!-- CSS для Owl Carousel - изображений -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+  <!-- Magnific Popup CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css">
+</head>
+
+<style>
+#result-container {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-top: 20px;
+}
+
+#result-header {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+#check-installation-btn {
+  display: block;
+  margin: 0 auto;
+  margin-top: 20px;
+}
+
+#brand-text {
+    color: black;
+    font-size: 22px; 
+    border-radius: 1px;
+    background-color: transparent;
+    padding: 1px 1px;
+  }
+
+  #app-description {
+    border: 0px solid #ccc;
+    padding: 10px;
+    margin-top: 20px;
+    max-width: 100%;
+    text-align: justify; 
+  }
+</style>
+
+<body>
+  <div class="navbar-fixed">
+    <nav>
+
+      <div class="nav-wrapper green lighten-5">
+        <a href="https://learn.innopolis.university" class="brand-logo" style="padding-left: 20px;">
+          <img src="{{url_for('static', filename='logo-4.svg')}}" alt="Logo" width="120" height="31">
+        </a>
+        <div id="brand-text" class="center-align" style="position: absolute; left: 50%; transform: translateX(-50%);">
+          <h5><p style="margin: 0;">Прогнозирование поломки станков</p><h5>
+        </div>
+        <ul class="right hide-on-med-and-down">
+          <li><a href="https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset" style="color: black;">Источник данных</a></li>
+          <li><a href="https://github.com/Rad2white" style="color: black;">GitHub</a></li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+  <div class="container">
+    <div class="row center">
+      <form id="installation-form" class="col s7 m7" action="/result_page" method="POST">
+        <div class="row">
+          <div class="input-field col s7 m7">
+            <div class="select-wrapper">
+              <label for="type_frais">Выберите тип установки</label>
+              <select name="type_frais" id="type_frais" class="browser-default" type="number">
+                <option value="1">M</option>
+                <option value="2">L</option>
+                <option value="3">H</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-field col s7 m7">
+            <label for="air_temp">Температура воздуха, ℃</label>
+            <input name="air_temp" id="air_temp" placeholder="Введите температуру воздуха, ℃" type="text"
+              class="validate input-result-trigger" step="any" oninput="this.value = this.value.replace(/[^0-9.]/g, '')" title="Число с разделителем - точка. Например, 36.6" />
+          </div>
+          <div class="input-field col s7 m7">
+            <label for="proc_temp">Температура процесса, ℃</label>
+            <input name="proc_temp" id="proc_temp" placeholder="Введите температуру процесса, ℃" type="text"
+              class="validate input-result-trigger" step="any" pattern="[0-9]+([.,][0-9]+)?" oninput="this.value = this.value.replace(/[^0-9.]/g, '')" title="Число с разделителем - точка. Например, 36.6" />
+          </div>
+          <div class="input-field col s7 m7">
+            <label for="rotation_speed">Скорость вращения инструмента, об/мин</label>
+            <input name="rotation_speed" id="rotation_speed" placeholder="Введите скорость вращения инструмента, об/мин"
+              type="number" class="validate input-result-trigger" />
+          </div>
+          <div class="input-field col s7 m7">
+            <label for="torque">Крутящий момент, Нм</label>
+            <input name="torque" id="torque" placeholder="Введите крутящий момент, Нм" type="text" class="validate input-result-trigger"
+              step="any" oninput="this.value = this.value.replace(/[^0-9.]/g, '')" title="Число с разделителем - точка. Например, 36.6" />
+          </div>
+          <div class="input-field col s7 m7">
+            <label for="tool_wear">Износ инструмента, мин</label>
+            <input name="tool_wear" id="tool_wear" placeholder="Введите износ инструмента, мин" type="number"
+              class="validate input-result-trigger" />
+              <div class="center">
+              <button id="check-installation-btn" class="btn waves-effect waves-light" type="button">Проверить станок</button>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div id="app-description" class="col s5 m5">
+        <div id="app-description-header" class="center"><h5>Краткое описание</h5></div>
+        <div id="app-description-content">
+          <p>Данное веб-приложение предназначено для прогнозирования поломки станка.</p>
+          <p>Оно предоставляет возможность для повышения надежности и эффективности промышленных установок, а также подчеркивает потенциал для дальнейших усовершенствований и применений в сфере предупреждения технических сбоев.</p>
+          <p>В левой части страницы необходимо задать параметры работы станка и нажать на кнопку "Проверить станок". В нижней части страницы расположены скриншоты диаграмм анализа данных</p>
+        </div>
+      </div>
+     <div id="result-container" class="col s5 m5">
+  <div id="result-header">Результат прогноза</div>
+  <div id="result-content"></div>
+</div>
+</div>
+
+  <div class="owl-carousel">
+    <div class="item">
+      <a href="{{ url_for('static', filename='images/fan1.jpg') }}" class="image-link">
+        <img src="{{ url_for('static', filename='images/fan1.jpg') }}" alt="Изображение 1">
+      </a>
+    </div>
+    <div class="item">
+      <a href="{{ url_for('static', filename='images/fan2.jpg') }}" class="image-link">
+        <img src="{{ url_for('static', filename='images/fan2.jpg') }}" alt="Изображение 2">
+      </a>
+    </div>
+    <div class="item">
+      <a href="{{ url_for('static', filename='images/fan3.jpg') }}" class="image-link">
+        <img src="{{ url_for('static', filename='images/fan3.jpg') }}" alt="Изображение 3">
+      </a>
+    </div>
+  </div>
+</body>
+
+<!-- Подключение Materilize -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<!-- Подключение jQuery -->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<!-- Подключение Owl Carousel JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+<!-- Magnific Popup JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js"></script>
+
+<!-- JavaScript - работа кнопки -->
+<script>
+$(document).ready(function () {
+
+  $(".input-result-trigger").on("input", function () {
+    $("#result-content").html(""); // Очистить только содержимое результата
+  });
+
+  $("#check-installation-btn").click(function () {
+    var formData = $("#installation-form").serialize();
+
+    $.post("/result_page", formData, function (data) {
+      if (data.error) {
+        $("#result-content").html("<p>" + data.error + "</p>");
+      } else {
+        $("#result-content").html("<p>Станок " + data.result + " с вероятностью: " + data.prob + "%</p>");
+      }
+    });
+  });
+});
+</script>
+
+<!-- JavaScript - инициализация Owl Carousel для изображений -->
+<script>
+  $(document).ready(function () {
+    $(".owl-carousel").owlCarousel({
+      loop: true,
+      margin: 10,
+      nav: true,
+      autoplay: true,
+      autoplayTimeout: 3000,
+      responsive: {
+        0: {
+          items: 1
+        },
+        600: {
+          items: 3
+        },
+        1000: {
+          items: 5
+        }
+      }
+    });
+
+// Инициализация Magnific Popup для лупы
+    $(".owl-carousel").magnificPopup({
+      delegate: 'a',
+      type: 'image',
+      gallery: {
+        enabled: true
+      },
+      zoom: {
+        enabled: true,
+        duration: 300,
+        easing: 'ease-in-out',
+        opener: function (openerElement) {
+          return openerElement.is('img') ? openerElement : openerElement.find('img');
+        }
+      }
+    });
+  });
+</script>
+
+<!-- JavaScript для выпадающего списка -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var elems = document.querySelectorAll('select');
+  });
+</script>
+
+</html>
