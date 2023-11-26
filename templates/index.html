@@ -9,7 +9,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
   <!-- Magnific Popup CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css">\
+  <!-- Подключение SweetAlert2 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 
 <style>
@@ -72,7 +74,7 @@
         <div class="row">
           <div class="input-field col s7 m7">
             <div class="select-wrapper">
-              <label for="type_frais">Выберите тип установки</label>
+              <label for="type_frais">Выберите тип станка</label>
               <select name="type_frais" id="type_frais" class="browser-default" type="number">
                 <option value="1">M</option>
                 <option value="2">L</option>
@@ -88,11 +90,11 @@
           <div class="input-field col s7 m7">
             <label for="proc_temp">Температура процесса, ℃</label>
             <input name="proc_temp" id="proc_temp" placeholder="Введите температуру процесса, ℃" type="text"
-              class="validate input-result-trigger" step="any" pattern="[0-9]+([.,][0-9]+)?" oninput="this.value = this.value.replace(/[^0-9.]/g, '')" title="Число с разделителем - точка. Например, 36.6" />
+              class="validate input-result-trigger" step="any" oninput="this.value = this.value.replace(/[^0-9.]/g, '')" title="Число с разделителем - точка. Например, 36.6" />
           </div>
           <div class="input-field col s7 m7">
             <label for="rotation_speed">Скорость вращения инструмента, об/мин</label>
-            <input name="rotation_speed" id="rotation_speed" placeholder="Введите скорость вращения инструмента, об/мин"
+            <input name="rotation_speed" id="rotation_speed" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Введите скорость вращения инструмента, об/мин"
               type="number" class="validate input-result-trigger" />
           </div>
           <div class="input-field col s7 m7">
@@ -102,7 +104,7 @@
           </div>
           <div class="input-field col s7 m7">
             <label for="tool_wear">Износ инструмента, мин</label>
-            <input name="tool_wear" id="tool_wear" placeholder="Введите износ инструмента, мин" type="number"
+            <input name="tool_wear" id="tool_wear" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Введите износ инструмента, мин" type="number"
               class="validate input-result-trigger" />
               <div class="center">
               <button id="check-installation-btn" class="btn waves-effect waves-light" type="button">Проверить станок</button>
@@ -151,28 +153,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 <!-- Magnific Popup JavaScript -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js"></script>
-
-<!-- JavaScript - работа кнопки -->
-<script>
-$(document).ready(function () {
-
-  $(".input-result-trigger").on("input", function () {
-    $("#result-content").html(""); // Очистить только содержимое результата
-  });
-
-  $("#check-installation-btn").click(function () {
-    var formData = $("#installation-form").serialize();
-
-    $.post("/result_page", formData, function (data) {
-      if (data.error) {
-        $("#result-content").html("<p>" + data.error + "</p>");
-      } else {
-        $("#result-content").html("<p>Станок " + data.result + " с вероятностью: " + data.prob + "%</p>");
-      }
-    });
-  });
-});
-</script>
+<!-- Подключение SweetAlert2 JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <!-- JavaScript - инициализация Owl Carousel для изображений -->
 <script>
@@ -219,6 +201,84 @@ $(document).ready(function () {
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     var elems = document.querySelectorAll('select');
+  });
+</script>
+
+<!-- JavaScript - работа кнопки -->
+<script>
+  $(document).ready(function () {
+
+    $(".input-result-trigger").on("input", function () {
+      $("#result-content").html(""); // Очистить только содержимое результата
+    });
+
+    $("#check-installation-btn").click(function () {
+      var formData = $("#installation-form").serialize();
+
+      // Проверка поля "Температура воздуха"
+      var airTempValue = parseFloat($("#air_temp").val());
+      if (isNaN(airTempValue) || airTempValue < 20 || airTempValue > 35) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Ошибка ввода температуры воздуха',
+          text: 'Температура воздуха должна быть в диапазоне от 20 до 35!'
+        });
+        return;
+      }
+
+      // Проверка поля "Температура процесса"
+      var procTempValue = parseFloat($("#proc_temp").val());
+      if (isNaN(procTempValue) || procTempValue < 30 || procTempValue > 45) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Ошибка ввода температуры процесса',
+          text: 'Температура процесса должна быть в диапазоне от 30 до 45!'
+        });
+        return;
+      }
+
+      // Проверка поля "Скорость вращения инструмента"
+      var rotationSpeedValue = parseFloat($("#rotation_speed").val());
+      if (isNaN(rotationSpeedValue) || rotationSpeedValue < 1100 || rotationSpeedValue > 2900) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Ошибка ввода скорости вращения инструмента',
+          text: 'Скорость вращения инструмента должна быть в диапазоне от 1100 до 2900!'
+        });
+        return;
+      }
+
+      // Проверка поля "Крутящий момент"
+      var torqueValue = parseFloat($("#torque").val());
+      if (isNaN(torqueValue) || torqueValue < 3.5 || torqueValue > 80) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Ошибка ввода крутящего момента',
+          text: 'Крутящий момент должен быть в диапазоне от 3.5 до 80!'
+        });
+        return;
+      }
+
+      // Проверка поля "Износ инструмента"
+      var toolWearValue = parseFloat($("#tool_wear").val());
+      if (isNaN(toolWearValue) || toolWearValue < 0 || toolWearValue > 300) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Ошибка ввода износа инструмента',
+          text: 'Износ инструмента должен быть в диапазоне от 0 до 300!'
+        });
+        return;
+      }
+
+      // Отправка данных после проверки
+      $.post("/result_page", formData, function (data) {
+        if (data.error) {
+          $("#result-content").html("<p>" + data.error + "</p>");
+        } else {
+          $("#result-content").html("<p>Станок " + data.result + " с вероятностью: " + data.prob + "%</p>");
+        }
+      });
+    });
   });
 </script>
 
