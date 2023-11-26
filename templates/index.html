@@ -117,7 +117,7 @@
         <div id="app-description-content">
           <p>Данное веб-приложение предназначено для прогнозирования поломки станка.</p>
           <p>Оно предоставляет возможность для повышения надежности и эффективности промышленных установок, а также подчеркивает потенциал для дальнейших усовершенствований и применений в сфере предупреждения технических сбоев.</p>
-          <p>В левой части страницы необходимо задать параметры работы станка и нажать на кнопку "Проверить станок". В нижней части страницы расположены скриншоты диаграмм анализа данных</p>
+          <p>В левой части страницы необходимо задать параметры работы станка и нажать на кнопку "Проверить станок". В нижней части страницы расположены диаграммы анализа данных</p>
         </div>
       </div>
      <div id="result-container" class="col s5 m5">
@@ -140,6 +140,21 @@
     <div class="item">
       <a href="{{ url_for('static', filename='images/fan3.jpg') }}" class="image-link">
         <img src="{{ url_for('static', filename='images/fan3.jpg') }}" alt="Изображение 3">
+      </a>
+    </div>
+    <div class="item">
+      <a href="{{ url_for('static', filename='images/fan4.jpg') }}" class="image-link">
+        <img src="{{ url_for('static', filename='images/fan4.jpg') }}" alt="Изображение 4">
+      </a>
+    </div>
+    <div class="item">
+      <a href="{{ url_for('static', filename='images/fan5.jpg') }}" class="image-link">
+        <img src="{{ url_for('static', filename='images/fan5.jpg') }}" alt="Изображение 5">
+      </a>
+    </div>
+    <div class="item">
+      <a href="{{ url_for('static', filename='images/fan6.jpg') }}" class="image-link">
+        <img src="{{ url_for('static', filename='images/fan6.jpg') }}" alt="Изображение 6">
       </a>
     </div>
   </div>
@@ -166,7 +181,7 @@
       autoplay: true,
       autoplayTimeout: 3000,
       responsive: {
-        0: {
+        300: {
           items: 1
         },
         600: {
