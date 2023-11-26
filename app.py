@@ -52,12 +52,14 @@ def process_data(type_frais,air_temp,proc_temp,rotation_speed,torque,tool_wear):
                                                 'rotationalspeedrpm', 'torquenm', 'toolwearmin'])
     #прогноз и ответ 
     y_pred_dec = XGB_model_loaded.predict(X_test).tolist()[0]
+    probability_proba = XGB_model_loaded.predict_proba(X_test)
     if y_pred_dec == 1:
         result_str = "подвержен поломке"
+        probability = round(probability_proba.tolist()[0][1]*100,2) #вероятность
     else:
         result_str = "работает в оптимальном режиме"
-    probability_proba = XGB_model_loaded.predict_proba(X_test)
-    probability = round(probability_proba.tolist()[0][0]*100,2) #вероятность
+        probability = round(probability_proba.tolist()[0][0]*100,2) #вероятность
+    
     return result_str, probability
 
 if __name__ == "__main__":
